@@ -112,7 +112,8 @@ def lambda_handler(event, context):  # noqa: D401  # AWS entrypoint name fixed
             txn = extract_transaction(body, sender)
             if txn is None:
                 continue
-            txn.raw_email_id = uid  # store IMAP UID to deduplicate in future
+            txn.raw_email_id = uid  # store IMAP UID for reference
+            txn.txn_id = uid        # use UID as primary key to avoid duplicates
             save_transaction(table, txn)
 
     return {

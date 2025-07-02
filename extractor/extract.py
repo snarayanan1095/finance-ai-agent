@@ -16,9 +16,23 @@ from shared.models import Transaction
 # ---------------------------------------------------------------------------
 # OpenAI helpers
 # ---------------------------------------------------------------------------
+CATEGORIES = [
+    "groceries",
+    "dining",
+    "utilities",
+    "transportation",
+    "entertainment",
+    "health",
+    "subscriptions",
+    "shopping",
+    "travel",
+    "income",
+    "other",
+]
+
 SCHEMA = {
     "name": "extract_transaction",
-    "description": "Extract the first monetary transaction mentioned in the input text.",
+    "description": "Extract the first monetary transaction mentioned in the input text and classify its spending category.",
     "parameters": {
         "type": "object",
         "properties": {
@@ -27,12 +41,16 @@ SCHEMA = {
             "currency": {"type": "string"},
             "txn_type": {"type": "string", "enum": ["credit", "debit"]},
             "merchant": {"type": "string"},
+            "category": {"type": "string", "enum": CATEGORIES},
         },
-        "required": ["txn_date", "amount", "txn_type"],
+        "required": ["txn_date", "amount", "txn_type", "category"],
     },
 }
 
-SYSTEM_PROMPT = """You are a strict financial parsing engine. Given an email body, extract ONLY the first monetary transaction. Respond ONLY with JSON that matches the provided schema."""
+SYSTEM_PROMPT = """You are a strict financial parsing engine. Given an email body, you must:
+1. If the message confirms an OUTGOING SPEND/CHARGE (money leaving the user, e.g. a credit-card purchase, ATM withdrawal, bill payment), extract ONLY the first such transaction and respond by calling the function `extract_transaction` with JSON arguments that match the schema. Mark it with `txn_type = \"debit\"`.
+2. Ignore deposits, refunds, salary credits, statement summaries, reward points/miles notifications, promotions, newsletters, and any message that does NOT confirm money being spent. For those, DO NOT call any function and instead reply with the literal string `NO_TRANSACTION`.
+"""
 
 # ---------------------------------------------------------------------------
 
@@ -53,22 +71,28 @@ def extract_transaction(email_text: str, sender: str, *, openai_client: Optional
     client = openai_client or openai
     # openai<1.0.0 uses openai.ChatCompletion.create
     response = client.ChatCompletion.create(
-        model="gpt-3.5-turbo-0125",
+        model="gpt-4o-mini",
         temperature=0,
-        response_format={"type": "json_object"},
-        functions=[SCHEMA],
-        function_call={"name": "extract_transaction"},
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": email_text},
         ],
+        functions=[SCHEMA],
     )
-    msg = response["choices"][0]["message"]
-    fc = msg.get("function_call") if isinstance(msg, dict) else None
-    if not fc or not fc.get("arguments"):
-        return None  # model did not return a structured result
+    choice = response["choices"][0]
+    msg = choice.get("message", {})
+    fc = msg.get("function_call")
+    if not fc:
+        # Model decided there is no transaction (likely replied with "NO_TRANSACTION")
+        return None
+    if not fc.get("arguments"):
+        return None
 
     args = json.loads(fc["arguments"])
+
+    # We only store spending (debit) transactions. Skip anything else.
+    if args["txn_type"] != "debit":
+        return None
 
     try:
         txn_date = datetime.fromisoformat(args["txn_date"]).date()
@@ -81,6 +105,7 @@ def extract_transaction(email_text: str, sender: str, *, openai_client: Optional
         currency=args.get("currency", "USD"),
         txn_type=args["txn_type"],
         merchant=args.get("merchant", ""),
+        category=args.get("category", "other"),
         source_email=sender,
     )
 

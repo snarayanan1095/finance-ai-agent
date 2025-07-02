@@ -12,6 +12,10 @@ import boto3
 import pandas as pd
 import streamlit as st
 
+# Ensure project root is on PYTHONPATH when Streamlit executes from within this subdir.
+import sys, pathlib
+sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
+
 from shared.models import Transaction
 
 
@@ -50,18 +54,25 @@ df = pd.DataFrame(rows)
 # ------------------------------------------------------------------
 # Summary tiles
 # ------------------------------------------------------------------
-col1, col2, col3 = st.columns(3)
+col1, col2 = st.columns(2)
 col1.metric("Total Spent", f"${df[df.Amount>0].Amount.sum():,.0f}")
-col2.metric("Total Credited", f"${-df[df.Amount<0].Amount.sum():,.0f}")
-col3.metric("Net", f"${df.Amount.sum():,.0f}")
+col2.metric("Net", f"${df.Amount.sum():,.0f}")
 
 st.divider()
 
 # Monthly bar chart
 st.subheader("Monthly Spend")
-df["Month"] = df["Date"].apply(lambda d: date(d.year, d.month, 1))
-month_group = df.groupby("Month")["Amount"].sum().sort_index()
+# Group by calendar month (YYYY-MM) for clearer labels
+month_series = pd.to_datetime(df["Date"]).dt.to_period("M").astype(str)
+month_group = df.groupby(month_series)["Amount"].sum().sort_index()
 st.bar_chart(month_group)
+
+st.divider()
+
+# Spend by Category
+st.subheader("Spend by Category")
+cat_group = df.groupby("Category")["Amount"].sum().sort_values(ascending=False)
+st.bar_chart(cat_group)
 
 st.divider()
 
