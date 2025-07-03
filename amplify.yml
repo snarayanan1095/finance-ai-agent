@@ -1,0 +1,16 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands: []
+    build:
+      commands:
+        # Build the Docker image from the Dockerfile in the repo root
+        - docker build -t finance-ai-agent .
+  artifacts:
+    # Container apps don’t produce a build directory, but the section is required
+    baseDirectory: /
+    files:
+      - '**/*'
+  cache:
+    paths: []
