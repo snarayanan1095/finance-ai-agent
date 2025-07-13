@@ -1,0 +1,28 @@
+Jul 13 07:23:26 ip-172-31-46-143 docker[1880]: time="2025-07-13T07:23:26.467475497Z" level=info msg="Starting up"
+Jul 13 07:23:26 ip-172-31-46-143 docker[1880]: time="2025-07-13T07:23:26.588995777Z" level=info msg="Loading containers: start."
+Jul 13 07:23:27 ip-172-31-46-143 docker[1880]: time="2025-07-13T07:23:27.247613559Z" level=info msg="Loading containers: done."
+Jul 13 07:23:27 ip-172-31-46-143 docker[1880]: time="2025-07-13T07:23:27.268233887Z" level=info msg="Docker daemon" commit=71907ca containerd-snapshotter=false storage-driver=overlay2 version=25.0.8
+Jul 13 07:23:27 ip-172-31-46-143 docker[1880]: time="2025-07-13T07:23:27.269456117Z" level=info msg="Daemon has completed initialization"
+Jul 13 07:23:27 ip-172-31-46-143 docker[1880]: time="2025-07-13T07:23:27.309814414Z" level=info msg="API listen on /run/docker.sock"
+Jul 13 07:24:25 ip-172-31-46-143 docker[1880]: 2025/07/13 07:24:25 http: superfluous response.WriteHeader call from go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp.(*respWriterWrapper).WriteHeader (wrap.go:98)
+Jul 13 07:24:49 ip-172-31-46-143 docker[1880]: time="2025-07-13T07:24:49.138515725Z" level=error msg="stream copy error: reading from a closed fifo"
+Jul 13 07:24:49 ip-172-31-46-143 docker[1880]: time="2025-07-13T07:24:49.138553833Z" level=error msg="stream copy error: reading from a closed fifo"
+Jul 13 07:37:34 ip-172-31-46-143 docker[1880]: 2025/07/13 07:37:34 http2: server: error reading preface from client @: read unix /run/docker.sock->@: read: connection reset by peer
+Jul 13 07:37:38 ip-172-31-46-143 docker[1880]: time="2025-07-13T07:37:38.229070943Z" level=error msg="stream copy error: reading from a closed fifo"
+Jul 13 07:37:38 ip-172-31-46-143 docker[1880]: time="2025-07-13T07:37:38.229096574Z" level=error msg="stream copy error: reading from a closed fifo"
+Jul 13 07:41:13 ip-172-31-46-143 docker[1880]: 2025/07/13 07:41:13 http2: server: error reading preface from client @: read unix /run/docker.sock->@: read: connection reset by peer
+Jul 13 07:41:13 ip-172-31-46-143 docker[1880]: 2025/07/13 07:41:13 http2: server: error reading preface from client @: read unix /run/docker.sock->@: read: connection reset by peer
+Jul 13 07:41:17 ip-172-31-46-143 docker[1880]: time="2025-07-13T07:41:17.099383232Z" level=error msg="stream copy error: reading from a closed fifo"
+Jul 13 07:41:17 ip-172-31-46-143 docker[1880]: time="2025-07-13T07:41:17.099392172Z" level=error msg="stream copy error: reading from a closed fifo"
+Jul 13 07:49:26 ip-172-31-46-143 docker[1880]: 2025/07/13 07:49:26 http2: server: error reading preface from client @: read unix /run/docker.sock->@: read: connection reset by peer
+Jul 13 07:49:30 ip-172-31-46-143 docker[1880]: time="2025-07-13T07:49:30.134969427Z" level=error msg="stream copy error: reading from a closed fifo"
+Jul 13 07:49:30 ip-172-31-46-143 docker[1880]: time="2025-07-13T07:49:30.134969759Z" level=error msg="stream copy error: reading from a closed fifo"
+Jul 13 07:55:16 ip-172-31-46-143 docker[1880]: 2025/07/13 07:55:16 http2: server: error reading preface from client @: read unix /run/docker.sock->@: read: connection reset by peer
+Jul 13 07:55:20 ip-172-31-46-143 docker[1880]: time="2025-07-13T07:55:20.800118112Z" level=error msg="stream copy error: reading from a closed fifo"
+Jul 13 07:55:20 ip-172-31-46-143 docker[1880]: time="2025-07-13T07:55:20.803620274Z" level=error msg="stream copy error: reading from a closed fifo"
+Jul 13 08:06:03 ip-172-31-46-143 docker[1880]: 2025/07/13 08:06:03 http2: server: error reading preface from client @: read unix /run/docker.sock->@: read: connection reset by peer
+Jul 13 08:06:08 ip-172-31-46-143 docker[1880]: time="2025-07-13T08:06:08.113034976Z" level=error msg="stream copy error: reading from a closed fifo"
+Jul 13 08:06:08 ip-172-31-46-143 docker[1880]: time="2025-07-13T08:06:08.113112940Z" level=error msg="stream copy error: reading from a closed fifo"
+Jul 13 08:13:25 ip-172-31-46-143 docker[1880]: 2025/07/13 08:13:25 http2: server: error reading preface from client @: read unix /run/docker.sock->@: read: connection reset by peer
+Jul 13 08:13:29 ip-172-31-46-143 docker[1880]: time="2025-07-13T08:13:29.540287070Z" level=error msg="stream copy error: reading from a closed fifo"
+Jul 13 08:13:29 ip-172-31-46-143 docker[1880]: time="2025-07-13T08:13:29.540287069Z" level=error msg="stream copy error: reading from a closed fifo"

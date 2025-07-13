@@ -2,15 +2,24 @@ version: 1
 frontend:
   phases:
     preBuild:
-      commands: []
+      commands:
+        - echo "Installing dependencies..."
+        - pip install -r requirements.txt
     build:
       commands:
-        # Build the Docker image from the Dockerfile in the repo root
-        - docker build -t finance-ai-agent .
+        - echo "Building Streamlit app..."
+        - mkdir -p dist
+        - cp -r streamlit_app/* dist/
+        - cp -r extractor dist/
+        - cp -r shared dist/
+        - cp requirements.txt dist/
+        - cp Dockerfile dist/
+        - echo "Build completed"
   artifacts:
-    # Container apps don’t produce a build directory, but the section is required
-    baseDirectory: /
+    baseDirectory: dist
     files:
       - '**/*'
   cache:
-    paths: []
+    paths:
+      - node_modules/**/*
+      - .venv/**/*

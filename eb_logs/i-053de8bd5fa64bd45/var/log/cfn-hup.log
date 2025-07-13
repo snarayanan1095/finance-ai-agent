@@ -1,0 +1,23 @@
+2025-07-13 07:23:22,303 [DEBUG] CloudFormation client initialized with endpoint https://cloudformation.us-west-2.amazonaws.com
+2025-07-13 07:23:22,303 [DEBUG] SQS client initialized with endpoint https://sqs.us-west-2.amazonaws.com
+2025-07-13 07:23:22,304 [DEBUG] CloudFormation client initialized with endpoint https://cloudformation.us-west-2.amazonaws.com
+2025-07-13 07:23:22,304 [DEBUG] Enabled single threading mode.
+2025-07-13 07:23:22,304 [DEBUG] Creating /var/lib/cfn-hup/data
+2025-07-13 07:23:22,313 [INFO] No umask value specified in config file. Using the default one: 0o22
+2025-07-13 07:23:22,365 [INFO] Pid: 1811
+2025-07-13 07:23:22,671 [INFO] Refreshing listener credentials
+2025-07-13 07:23:22,787 [INFO] Scheduling next credential refresh in 1800.0 seconds
+2025-07-13 07:24:22,792 [WARNING] Timeout of 60 seconds breached
+2025-07-13 07:24:22,792 [ERROR] Client-side timeout
+Traceback (most recent call last):
+  File "/usr/lib/python3.9/site-packages/cfnbootstrap/util.py", line 191, in _retry
+    return f(*args, **kwargs)
+  File "/usr/lib/python3.9/site-packages/cfnbootstrap/util.py", line 264, in _timeout
+    raise TimeoutError(
+cfnbootstrap.util.TimeoutError
+2025-07-13 07:24:23,601 [INFO] Received command ElasticBeanstalkCommand-AWSEBAutoScalingGroup (invocation id: 6354030d-7969-4a17-8eb5-9fd340254dda)
+2025-07-13 07:24:23,601 [INFO] Running action for aws-eb-command-handler
+2025-07-13 07:24:49,339 [INFO] Action for aws-eb-command-handler succeeded, returning SUCCESS
+2025-07-13 07:28:29,744 [INFO] command processing is alive.
+2025-07-13 07:32:37,881 [INFO] Received command ElasticBeanstalkCommand-AWSEBAutoScalingGroup (invocation id: 00c49a45-ca7a-4ec8-9d86-e7e590c0207d)
+2025-07-13 07:32:37,881 [INFO] Running action for aws-eb-command-handler

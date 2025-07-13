@@ -1,0 +1,128 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Finance AI Agent Backend Services for Amplify
+
+Parameters:
+  EmailHost:
+    Type: String
+    Default: imap.gmail.com
+    Description: IMAP server hostname
+  EmailUser:
+    Type: String
+    Description: Email address for IMAP access
+  EmailPassword:
+    Type: String
+    NoEcho: true
+    Description: Email password or app password
+  OpenAIKey:
+    Type: String
+    NoEcho: true
+    Description: OpenAI API key
+  EnvironmentName:
+    Type: String
+    Default: dev
+    Description: Environment name
+
+Resources:
+  # DynamoDB Table
+  TransactionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${EnvironmentName}-transactions"
+      AttributeDefinitions:
+        - AttributeName: txn_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: txn_id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+
+  # Lambda Execution Role
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${EnvironmentName}-finance-lambda-role"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:GetItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                Resource: !GetAtt TransactionsTable.Arn
+
+  # Lambda Function
+  EmailFetcherFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "${EnvironmentName}-finance-email-fetcher"
+      Runtime: python3.12
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps('Hello from Lambda!')
+              }
+      Timeout: 60
+      MemorySize: 512
+      Environment:
+        Variables:
+          EMAIL_HOST: !Ref EmailHost
+          EMAIL_USER: !Ref EmailUser
+          EMAIL_PASSWORD: !Ref EmailPassword
+          DYNAMODB_TABLE: !Ref TransactionsTable
+          OPENAI_API_KEY: !Ref OpenAIKey
+          ENVIRONMENT: !Ref EnvironmentName
+
+  # EventBridge Rule for Daily Execution
+  DailyRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub "${EnvironmentName}-daily-email-fetch"
+      Description: Trigger email fetcher daily
+      ScheduleExpression: rate(1 day)
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt EmailFetcherFunction.Arn
+          Id: EmailFetcherTarget
+
+  # Permission for EventBridge to invoke Lambda
+  LambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref EmailFetcherFunction
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt DailyRule.Arn
+
+Outputs:
+  TransactionsTableName:
+    Description: Name of the DynamoDB table
+    Value: !Ref TransactionsTable
+    Export:
+      Name: !Sub "${EnvironmentName}-transactions-table-name"
+  
+  LambdaFunctionArn:
+    Description: ARN of the Lambda function
+    Value: !GetAtt EmailFetcherFunction.Arn
+    Export:
+      Name: !Sub "${EnvironmentName}-email-fetcher-arn" 

@@ -27,6 +27,7 @@ CATEGORIES = [
     "shopping",
     "travel",
     "income",
+    "investment",
     "other",
 ]
 
