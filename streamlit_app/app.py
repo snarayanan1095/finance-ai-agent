@@ -16,6 +16,12 @@ import streamlit as st
 import sys, pathlib
 sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 
+try:
+    from extractor import CATEGORIES  # provided by extractor.__init__
+except ImportError:
+    # Fallback if package not discoverable
+    from extractor.extract import CATEGORIES
+
 from shared.models import Transaction
 
 
@@ -29,9 +35,47 @@ def load_transactions() -> List[Transaction]:
     return txns
 
 
+def save_transaction(txn: Transaction) -> None:
+    """Persist a new transaction to DynamoDB."""
+    table_name = os.environ.get("DYNAMODB_TABLE", "transactions")
+    ddb = boto3.resource("dynamodb")
+    table = ddb.Table(table_name)
+    table.put_item(Item=txn.to_item())
+
+
 st.set_page_config(page_title="Personal Finance Dashboard", layout="wide")
 
 st.title("💳 Personal Finance Dashboard")
+
+# ------------------------------------------------------------------
+# Add Transaction Form
+# ------------------------------------------------------------------
+with st.expander("➕ Add Transaction", expanded=False):
+    with st.form("add_txn"):
+        col1, col2 = st.columns(2)
+        txn_date = col1.date_input("Date", value=date.today())
+        merchant = col2.text_input("Merchant")
+        amount = st.number_input("Amount", min_value=0.0, step=0.01)
+        txn_type = st.selectbox("Type", ["debit", "credit"], index=0)
+        # Using predefined categories for consistency
+        category = st.selectbox("Category", CATEGORIES, index=CATEGORIES.index("other") if "other" in CATEGORIES else 0)
+        submitted = st.form_submit_button("Add")
+
+    if submitted:
+        new_txn = Transaction(
+            txn_date=txn_date,
+            merchant=merchant,
+            amount=float(amount),
+            txn_type=txn_type,
+            category=category,
+        )
+        save_transaction(new_txn)
+        st.success("Transaction added!")
+        # Rerun to refresh UI with new data
+        if hasattr(st, "experimental_rerun"):
+            st.experimental_rerun()
+        else:
+            st.rerun()
 
 txns = load_transactions()
 if not txns:
