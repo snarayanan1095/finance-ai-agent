@@ -27,7 +27,8 @@ from shared.models import Transaction
 
 def load_transactions() -> List[Transaction]:
     table_name = os.environ.get("DYNAMODB_TABLE", "transactions")
-    ddb = boto3.resource("dynamodb")
+    region = os.environ.get("AWS_REGION", "us-west-2")
+    ddb = boto3.resource("dynamodb", region_name=region)
     table = ddb.Table(table_name)
     resp = table.scan()
     items = resp.get("Items", [])
@@ -38,12 +39,18 @@ def load_transactions() -> List[Transaction]:
 def save_transaction(txn: Transaction) -> None:
     """Persist a new transaction to DynamoDB."""
     table_name = os.environ.get("DYNAMODB_TABLE", "transactions")
-    ddb = boto3.resource("dynamodb")
+    region = os.environ.get("AWS_REGION", "us-west-2")
+    ddb = boto3.resource("dynamodb", region_name=region)
     table = ddb.Table(table_name)
     table.put_item(Item=txn.to_item())
 
 
 st.set_page_config(page_title="Personal Finance Dashboard", layout="wide")
+
+# Simple health check for App Runner
+if st.query_params.get("health") == "check":
+    st.write("OK")
+    st.stop()
 
 st.title("💳 Personal Finance Dashboard")
 
