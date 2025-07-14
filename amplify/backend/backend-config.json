@@ -31,6 +31,18 @@
             "attributes": ["GraphQLAPIIdOutput"]
           }
         ]
+      },
+      "scheduledEmailProcessor": {
+        "service": "Lambda",
+        "providerPlugin": "awscloudformation",
+        "build": true,
+        "dependsOn": [
+          {
+            "category": "function",
+            "resourceName": "emailFetcher",
+            "attributes": ["Name", "Arn"]
+          }
+        ]
       }
     },
     "storage": {

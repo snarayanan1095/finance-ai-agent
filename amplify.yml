@@ -7,19 +7,13 @@ frontend:
         - pip install -r requirements.txt
     build:
       commands:
-        - echo "Building Streamlit app..."
-        - mkdir -p dist
-        - cp -r streamlit_app/* dist/
-        - cp -r extractor dist/
-        - cp -r shared dist/
-        - cp requirements.txt dist/
-        - cp Dockerfile dist/
+        - echo "Building Docker image for App Runner..."
+        - docker build -t finance-ai-agent .
         - echo "Build completed"
   artifacts:
-    baseDirectory: dist
+    baseDirectory: .
     files:
       - '**/*'
   cache:
     paths:
-      - node_modules/**/*
       - .venv/**/*
